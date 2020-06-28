@@ -1,0 +1,27 @@
+{
+  "name": "my_cqManger",
+  "version": "1.0.0",
+  "description": "完成前后端增删该查",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HuaChuanXing/my_cqManger.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HuaChuanXing/my_cqManger/issues"
+  },
+  "homepage": "https://github.com/HuaChuanXing/my_cqManger#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "multer": "^1.4.2",
+    "mysql": "^2.18.1",
+    "mysql-ithm": "^2.2.2"
+  }
+}
