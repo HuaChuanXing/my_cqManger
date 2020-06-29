@@ -1,4 +1,4 @@
-# reimagined-garbanzo
+#my_cqManger
 完成前后端增删该查
 #静态资源准备：
 第一步：将所需要的包下载到本地中，以及将静态资源导入到www文件夹中
