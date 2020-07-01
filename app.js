@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const multer = require('multer')
 const path = require('path');
 const svgCaptcha = require('svg-captcha');
+const cookieSession = require('cookie-session');
 
 // 自动生成一个接收上传文件的文件位置
 var upload = multer({ dest: path.join(__dirname, 'www', 'uploads/') })
@@ -28,6 +29,13 @@ app.use(express.static('www'))
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
+
+app.use(cookieSession({
+    name: 'session',
+    keys: ['hcx'],
+    // Cookie Options
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 
 // 路由地址
 // 1.查询所有英雄
@@ -217,12 +225,39 @@ app.post('/user/register', (request, response) => {
 
 // 8.用户登录
 app.post('/user/login', (request, response) => {
-
+    let { username, password } = request.body;
+    c_hero.query(`select * from user where username='${username}' and password='${password}'`, (err, results) => {
+        if (err) {
+            response.send({
+                code: 500,
+                msg: '服务器内部错误！'
+            });
+        } else {
+            request.session.myuser = 'cautionssiontologin'
+            response.send({
+                code: 200,
+                msg: '登录成功！'
+            });
+        };
+    });
 });
 
 // 9.用户退出
-app.post('/logout', (request, response) => {
+app.get('/logout', (request, response) => {
+    request.session = null;
+    response.writeHead(302, {
+        'Location': './login.html'
+    });
+    response.end();
+});
 
+// 10.判断是否登录
+app.get('/isLogin', (request, response) => {
+    response.send({
+        code: 200,
+        msg: '登录了',
+        denglu: request.session.myuser
+    });
 });
 
 // 关闭连接
