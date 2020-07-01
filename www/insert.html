@@ -92,32 +92,22 @@
         $(function() {
             // 给新增按钮创建点击事件
             $('.btn-insert').on('click', function(e) {
-                // 取消按钮的默认提交行为
                 e.preventDefault();
-                // 创建FormData对象
                 let fd = new FormData($('#form')[0]);
-                // 发送ajax请求
                 $.ajax({
                     type: 'post',
                     url: 'http://127.0.0.1:4399/hero/add',
                     data: fd,
                     contentType: false,
                     processData: false,
-                    success: function(backData) {
-                        // console.log(backData);
-                        if (backData.code == '200') {
+                    success(backData) {
+                        console.log(backData);
+                        if (backData.code == 200) {
                             alert('新增成功！');
                             location.href = './index.html';
                         };
                     }
                 });
-            });
-
-            // 头像预览
-            $('#icon').on('change', function() {
-                let file = this.files[0];
-                let url = URL.createObjectURL(file);
-                $('#iconImg').attr('src', url);
             });
         });
     </script>

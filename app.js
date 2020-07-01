@@ -22,6 +22,9 @@ c_hero.connect();
 // 创建服务器
 const app = express();
 
+// 过如下代码就可以将 public 目录下的图片、CSS 文件、JavaScript 文件对外开放访问了
+app.use(express.static('www'))
+
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
 
@@ -31,7 +34,7 @@ app.get('/hero/all', (request, response) => {
     let { search } = request.query;
     if (search != undefined) {
         // 表示是根据关键字来查询英雄
-        c_hero.query(`select * from hero where heroName like '%${search}%'`, (err, results) => {
+        c_hero.query(`select * from hero where isDelete='false' and heroName like '%${search}%' order by id desc`, (err, results) => {
             if (err) {
                 response.send({
                     code: 500,
@@ -47,7 +50,7 @@ app.get('/hero/all', (request, response) => {
         });
     } else {
         // 查询所有的英雄
-        c_hero.query(`select * from hero`, (error, results, fields) => {
+        c_hero.query(`select * from hero where isDelete='false' order by id desc`, (error, results, fields) => {
             if (error) {
                 response.send({
                     code: 500,
@@ -77,7 +80,7 @@ app.get('/hero/user', (request, response) => {
             response.send({
                 code: 200,
                 msg: '查询成功！',
-                data: results
+                data: results[0]
             });
         };
     });
@@ -143,6 +146,7 @@ app.post('/hero/add', upload.single('heroIcon'), (request, response) => {
 // 5.删除英雄
 app.post('/hero/delete', (request, response) => {
     let { id } = request.body;
+    // console.log(id);
     c_hero.query(`update hero set isDelete='true' where id='${id}'`, (err, results) => {
         if (err) {
             response.send({
@@ -156,9 +160,9 @@ app.post('/hero/delete', (request, response) => {
             });
         };
     });
-    response.send('123');
 });
 
+// 6.
 
 // 关闭连接
 // c_hero.end();

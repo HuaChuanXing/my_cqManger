@@ -89,54 +89,46 @@
 
 
     <script>
-        // 获取到首页传递过来的id
-        let id = location.search.split('=')[1];
-        // 页面一加载就根据id获取英雄信息，展示在页面
-        $.ajax({
-            type: 'get',
-            url: 'http://127.0.0.1:4399/hero/info',
-            data: {
-                id
-            },
-            success: function(backData) {
-                console.log(backData);
-                if (backData.code == '200') {
-                    $('#name').val(backData.data[0].heroName);
-                    $('#skill').val(backData.data[0].heroSkill);
-                    $('#iconImg').attr('src', backData.data[0].heroIcon);
-                    $('#id').val(backData.data[0].Id);
-                };
-            }
-        });
-        // 头像预览
-        $('#icon').on('change', function() {
-            let file = this.files[0];
-            let url = URL.createObjectURL(file);
-            $('#iconImg').attr('src', url);
-        });
-
-        // 给保存按钮创建点击事件
-        $('.btn-save').on('click', function(e) {
-            //取消按钮的默认提交行为
-            e.preventDefault();
-            // 创建一个FormData对象
-            let fd = new FormData($('#form')[0]);
-            if (fd.get('heroIcon').name == '') {
-                alert('请传入正确的英雄头像！');
-                return;
-            };
+        $(function() {
+            // 获取到首页传递过来的id
+            let id = location.search.split('=')[1];
             $.ajax({
-                type: 'post',
-                url: 'http://127.0.0.1:4399/hero/update',
-                data: fd,
-                contentType: false,
-                processData: false,
+                type: 'get',
+                url: 'http://127.0.0.1:4399/hero/user',
+                data: {
+                    id
+                },
                 success(backData) {
-                    if (backData.code == '200') {
-                        alert('更新成功！');
-                        location.href = './index.html';
-                    };
+                    $('#name').val(backData.data.heroName);
+                    $('#skill').val(backData.data.heroSkill);
+                    $('#iconImg').attr('src', backData.data.heroIcon);
                 }
+            });
+
+            // 头像预览
+            $('#icon').on('change', function() {
+                let file = this.files[0];
+                let url = URL.createObjectURL(file);
+                $('#iconImg').attr('src', url);
+            });
+
+            $('.btn-save').on('click', function(e) {
+                e.preventDefault();
+                let fd = new FormData($('#form')[0]);
+                $.ajax({
+                    type: 'post',
+                    url: 'http://127.0.0.1:4399/hero/update',
+                    data: fd,
+                    contentType: false,
+                    processData: false,
+                    success(backData) {
+                        // console.log(backData);
+                        alert(backData.msg);
+                        if (backData.code == 200) {
+                            location.href = './index.html';
+                        };
+                    }
+                });
             });
         });
     </script>

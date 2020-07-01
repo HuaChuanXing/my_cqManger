@@ -62,7 +62,7 @@
                                 </div>
                             </div>
                             <button type="button" class="btn btn-success btn-search" id="searchBtn">查找</button>
-                            <button type="button" class="btn btn-warning" onclick="location.href='./insert.html'">新增</button>
+                            <button type="button" class="btn btn-warning" id="btn-add" onclick="location.href='./insert.html'">新增</button>
                         </form>
                     </div>
                     <!-- 内容 -->
@@ -99,72 +99,66 @@
     <script type="text/html" id="heroList">
         {{each data v}}
         <tr>
-            <td> {{v.heroName}} </td>
-            <td> {{v.heroSkill}} </td>
+            <td>{{v.heroName}}</td>
+            <td>{{ v.heroSkill}}</td>
             <td><img src="{{v.heroIcon}}" width="72px" height="72px"></td>
             <td class="manager">
                 <button class="btn btn-success" onclick="location.href='./update.html?id={{v.Id}}'">编辑🐷</button>
-                <button class="btn btn-danger" id="btn-delete" data-id="{{v.Id}}">删除👍</button>
+                <button class="btn btn-danger" id='btn-delete' data-id='{{v.Id}}'>删除👍</button>
             </td>
         </tr>
         {{/each}}
     </script>
     <script>
         $(function() {
-            // 页面一加载就将所有的英雄全部显示在页面中
+            // 需求一：页面一加载就显示所有的英雄
+            getData();
+
             function getData() {
                 $.ajax({
                     type: 'get',
-                    url: 'http://127.0.0.1:4399/hero/list',
+                    url: 'http://127.0.0.1:4399/hero/all',
                     success(backData) {
                         // console.log(backData);
                         if (backData.code == 200) {
-                            let resHmlt = template('heroList', backData);
-                            $('tbody').html(resHmlt);
+                            let resHtml = template('heroList', backData);
+                            $('tbody').html(resHtml);
                         };
                     }
                 });
             };
-            getData();
 
-            // 给查找按钮创建点击事件
-            $('#searchBtn').on('click', (e) => {
-                // 取消按钮的默认提交行为
+            // 需求二：点击查找按钮，获取相应的英雄
+            $('#searchBtn').on('click', function(e) {
+                // 取消按钮的默认行为
                 e.preventDefault();
-                // 获取输入框中的值
+                // 获取输入框中的内容
                 let search = $('#search').val().trim();
-                // 非空判断
                 if (search == '') {
-                    alert('请输入正确的英雄名！');
+                    alert('请输入你要搜索的英雄');
                     return;
                 };
                 // 发送ajax请求
                 $.ajax({
                     type: 'get',
-                    url: 'http://127.0.0.1:4399/hero/list',
+                    url: 'http://127.0.0.1:4399/hero/all',
                     data: {
                         search
                     },
                     success(backData) {
                         // console.log(backData);
-                        if (backData.data.length == 0) {
-                            $('tbody').html('没有数据');
-                            return;
-                        };
-                        let resHmlt = template('heroList', backData);
-                        $('tbody').html(resHmlt);
+                        let resHtml = template('heroList', backData);
+                        $('tbody').html(resHtml);
                     }
                 });
             });
 
-
-            // 给删除按钮创建点击事件
+            // 需求三：
             $('tbody').on('click', 'button#btn-delete', function(e) {
-                // 取消按钮的默认行为
                 e.preventDefault();
-                if (confirm('你确定删除该英雄吗？')) {
+                if (confirm('你确定要删除吗？')) {
                     let id = $(this).attr('data-id');
-                    // 发送ajax请求
+                    // console.log(id);
                     $.ajax({
                         type: 'post',
                         url: 'http://127.0.0.1:4399/hero/delete',
@@ -173,15 +167,12 @@
                         },
                         success(backData) {
                             alert(backData.msg);
-                            if (backData.code == '200') {
-                                // 重新加载数据
+                            if (backData.code == 200) {
                                 getData();
-                            }
+                            };
                         }
                     });
-                } else {
-                    alert('感谢大人的不杀之恩！');
-                };
+                }
             });
         });
     </script>
