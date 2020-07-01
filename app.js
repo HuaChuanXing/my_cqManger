@@ -4,6 +4,7 @@ const mysql = require('mysql');
 const bodyParser = require('body-parser');
 const multer = require('multer')
 const path = require('path');
+const svgCaptcha = require('svg-captcha');
 
 // 自动生成一个接收上传文件的文件位置
 var upload = multer({ dest: path.join(__dirname, 'www', 'uploads/') })
@@ -162,7 +163,67 @@ app.post('/hero/delete', (request, response) => {
     });
 });
 
-// 6.
+// 6.验证码
+let captchaTxt = null;
+app.get('/captcha', (request, response) => {
+    var captcha = svgCaptcha.create({
+        size: 4,
+        ignoreChars: '0o1i',
+        noise: 4,
+        color: 'red'
+    });
+    captchaTxt = captcha.text;
+    response.type('svg');
+    response.status(200).send(captcha.data);
+});
+
+// 7.用户注册
+app.post('/user/register', (request, response) => {
+    let { username, password, code } = request.body;
+    if (code.toLowerCase() != captchaTxt.toLowerCase()) {
+        response.send({
+            code: 500,
+            msg: '验证码错误！'
+        });
+    } else {
+        c_hero.query(`select * from user where username='${username}'`, (err, results) => {
+            if (err) {
+                response.send({
+                    code: 500,
+                    smg: '服务器内部错误！'
+                });
+            } else {
+                if (results.length > 0) {
+                    // 已经注册了的账号
+                    response.send({
+                        code: 203,
+                        msg: '已经注册了！'
+                    });
+                } else {
+                    // 未注册的账号
+                    c_hero.query(`insert into user (username,password) values ('${username}','${password}')`, (err, results) => {
+                        if (!err) {
+                            response.send({
+                                code: 200,
+                                msg: '注册成功！'
+                            });
+                        };
+                    });
+                };
+            };
+        });
+    };
+});
+
+// 8.用户登录
+app.post('/user/login', (request, response) => {
+
+});
+
+// 9.用户退出
+app.post('/logout', (request, response) => {
+
+});
 
 // 关闭连接
 // c_hero.end();
